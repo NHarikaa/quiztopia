@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Topia - Responsive Quiz Website</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+            
+            ;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+        
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            background-image: url(images/pink\ bg\ flash.jpg);
+            background-size: cover;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .section {
+            display: none;
+            padding: 40px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .genre-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .genre-card {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            border: none;
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .genre-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .genre-card:nth-child(2) { background: linear-gradient(135deg, #eda8d2f1 0%, #fed6e3bb 100%); }
+        .genre-card:nth-child(3) { background: linear-gradient(135deg, #fbffd2ec 0%, #fcb69fbb 100%); }
+        .genre-card:nth-child(4) { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
+        .genre-card:nth-child(5) { background: linear-gradient(135deg, #86eee0ec 0%, #f51c76bd 100%); }
+        .genre-card:nth-child(6) { background: linear-gradient(135deg, #e1fda1e1 0%, #c2e9fbb6 100%); }
+        .genre-card:nth-child(7) { background: linear-gradient(135deg, #fde4a1 0%, #fbc2c2 100%); }
+        .genre-card:nth-child(8) { background: linear-gradient(135deg, #a9fda1 0%, #eec2fbf1 100%); }
+
+
+        .quiz-container {
+            text-align: center;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .question {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.wrong {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            background: #f8f9ff;
+            border: 2px solid #e1e5f2;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .option:hover:not(.correct):not(.wrong) {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .option.correct {
+            background: #4CAF50 !important;
+            border-color: #4CAF50 !important;
+            color: white !important;
+        }
+
+        .option.wrong {
+            background: #f44336 !important;
+            border-color: #f44336 !important;
+            color: white !important;
+        }
+
+        .option.selected {
+            background: #2196F3 !important;
+            border-color: #2196F3 !important;
+            color: white !important;
+        }
+
+        .timer {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 250px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result-container {
+            text-align: center;
+        }
+
+        .score {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .coins {
+            font-size: 2rem;
+            color: #ffd700;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e1e5f2;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .genre-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .question {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+        .quit-btn:hover {
+            background: #f1868686 !important;
+
+
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Home Section -->
+        <div id="home" class="section active">
+            <h1><img src="images/quiz logo.jfif", height="70px", width="70px",position="center"></IMg>QUIZTOPIA</h1>
+            <p class="subtitle">Challenge yourself with exciting quizzes!</p>
+            <div class="genre-grid">
+                <button class="genre-card" onclick="startQuiz('GeneralKnowledge')">
+                    Explore the World🌎<br><span style="font-size: 0.9rem; font-weight: 400;">Countries & Culture</span>
+                </button>
+                <button class="genre-card" onclick="startQuiz('ComputerScience')">
+                    SMART TECH💻<br><span style="font-size: 0.9rem; font-weight: 400;">Computer Science</span>
+                </button>
+                <button class="genre-card" onclick="startQuiz('Currentaffairs')">
+                    GLOBAL UPDATES📰<br><span style="font-size: 0.9rem; font-weight: 400;">Current affairs</span>
+                </button>
+                <button class="genre-card" onclick="startQuiz('fun')">
+                    FUN ZONE🎉<br><span style="font-size: 0.9rem; font-weight: 400;">Fun Questions</span>
+                </button>
+                <button class="genre-card" onclick="startQuiz('lifestyle')">
+                    MODERN TRENDS🎨<br><span style="font-size: 0.9rem; font-weight: 400;">Lifestyle&random talks</span>
+                </button>
+                <button class="genre-card" onclick="startQuiz('histories')">
+                    EXPLORING CULTURES🎐<br><span style="font-size: 0.9rem; font-weight: 400;">Histories, Flags, Food</span>
+                </button>
+                <button class="genre-card" onclick="startQuiz('sports')">
+                    WORLD OF SPORTS🏆<br><span style="font-size: 0.9rem; font-weight: 400;">Sports and Fitness</span>
+                </button>
+                <button class="genre-card" onclick="startQuiz('social awareness')">
+                    SOCIAL AWARENESS🤳<br><span style="font-size: 0.9rem; font-weight: 400;">Social issues</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quiz" class="section">
+            <div class="quiz-container">
+                <button class="btn quit-btn" onclick="quitQuiz()" style="background: #ff6b6b; margin-bottom: 20px; max-width: 200px;">❌ Quit Quiz</button>
+                <div class="timer" id="timer">30s</div>
+                <div class="question-number" id="questionNumber"></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="question" id="question"></div>
+                <div class="feedback" id="feedback"></div>
+                <div class="options" id="options"></div>
+                <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>Next Question</button>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div id="result" class="section">
+            <div class="result-container">
+                <h1>🎉 Quiz Complete!</h1>
+                <div class="score" id="finalScore"></div>
+                <div class="coins" id="coinsEarned"></div>
+                <p style="color: #666; margin-bottom: 40px;">Great job! Keep challenging yourself!</p>
+                <button class="btn" onclick="restartQuiz()">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Quiz data organized by genre
+        const quizzes = {
+            GeneralKnowledge: [
+                {
+                    q: "What is the capital of Australia?",
+                    options: ["Sydney", "Melbourne", "Canberra", "Perth"],
+                    correct: 2 // Canberra
+                },
+                {
+                    q: "Which element has the chemical symbol “O”?",
+                    options: ["Gold", "Oxygen", "Osmium", "Iron"],
+                    correct: 1 // Oxygen
+                },
+                {
+                    q: "Which country hosted the 2016 Olympics?",
+                    options: ["China", "UK", "Brazil", "Japan"],
+                    correct: 2 // Brazil
+                },
+                {
+                    q: "Who wrote Romeo and Juliet?",
+                    options: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"],
+                    correct: 1 // William Shakespeare
+                },
+                {
+                    q: "What is the largest desert in the world?",
+                    options: ["Sahara", "Arctic", "Antarctic", "Gobi"],
+                    correct: 2 // Antarctic
+                },
+                {
+                    q: "How many bones are in the human body?",
+                    options: ["200", "206", "210", "198"],
+                    correct: 1 // 206
+                },
+                {
+                    q: "Which gas do plants absorb?",
+                    options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"],
+                    correct: 2 // Carbon Dioxide
+                },
+                {
+                    q: "Which is the longest river?",
+                    options: ["Amazon", "Nile", "Ganga", "Yangtze"],
+                    correct: 1 // Nile
+                },
+                {
+                    q: "Which country invented pizza?",
+                    options: ["USA", "France", "Italy", "Greece"],
+                    correct: 2 // Italy
+                },
+                {
+                    q: "What is the currency of the UK?",
+                    options: ["Euro", "Pound", "Dollar", "Franc"],
+                    correct: 1 // Pound
+                }
+
+            ],
+            ComputerScience: [
+                { q: "What is the time complexity of binary search?",
+                    options: ["O(n)", "O(log n)", "O(n log n)", "O(1)"],
+                    correct: 1 },
+                {
+                    q: "Which language is primarily used for system-level programming?",
+                    options: ["Python", "C", "JavaScript", "HTML"],
+                    correct: 1 // "C"
+                },
+                {
+                    q: "What does SQL stand for?",
+                    options: ["Structured Query Language", "Simple Query Logic", "System Query Language", "Sequential Query Language"],
+                    correct: 0 // "Structured Query Language"
+                },
+                {
+                    q: "Which data structure uses FIFO?",
+                    options: ["Stack", "Queue", "Tree", "Graph"],
+                    correct: 1 // "Queue"
+                },
+                {
+                    q: "What is the default port for HTTP?",
+                    options: ["21", "80", "443", "22"],
+                    correct: 1 // "80"
+                },
+                {
+                    q: "Which sorting algorithm is fastest in average case?",
+                    options: ["Bubble Sort", "Selection Sort", "Quick Sort", "Insertion Sort"],
+                    correct: 2 // "Quick Sort"
+                },
+                {
+                    q: "What is Git mainly used for?",
+                    options: ["Designing", "Version control", "Testing", "Hosting"],
+                    correct: 1 // "Version control"
+                },
+                {
+                    q: "Which paradigm does Java follow?",
+                    options: ["Functional", "Procedural", "Object-Oriented", "Logic"],
+                    correct: 2 // "Object-Oriented"
+                },
+                {
+                    q: "What does API stand for?",
+                    options: ["Application Programming Interface", "Advanced Program Integration", "Application Process Input", "None"],
+                    correct: 0 // "Application Programming Interface"
+                },
+                {
+                    q: "Which language is used for styling web pages?",
+                    options: ["HTML", "CSS", "Python", "C++"],
+                    correct: 1 // "CSS"
+                }
+
+            ],
+            Currentaffairs: [
+
+                {
+                    q: "Which country hosted COP28 (climate summit)?",
+                    options: ["India", "UAE", "UK", "USA"],
+                    correct: 1 // UAE
+                },
+                {
+                    q: "India's Chandrayaan-3 landed on which part of Moon?",
+                    options: ["Equator", "North pole", "South pole", "Dark side"],
+                    correct: 2 // South pole
+                },
+                {
+                    q: "Which organization regulates global health?",
+                    options: ["UN", "WHO", "IMF", "WTO"],
+                    correct: 1 // WHO
+                },
+                {
+                    q: "G20 Summit 2023 was held in?",
+                    options: ["Delhi", "Mumbai", "Goa", "Chennai"],
+                    correct: 0 // Delhi
+                },
+                {
+                    q: "Which AI model is developed by OpenAI?",
+                    options: ["Gemini", "ChatGPT", "Bard", "Copilot"],
+                    correct: 1 // ChatGPT
+                },
+                {
+                    q: "Which country launched Artemis mission?",
+                    options: ["Russia", "USA", "China", "India"],
+                    correct: 1 // USA
+                },
+                {
+                    q: "Digital India initiative launched by?",
+                    options: ["Manmohan Singh", "Narendra Modi", "Rahul Gandhi", "Kalam"],
+                    correct: 1 // Narendra Modi
+                },
+                {
+                    q: "Which country is top oil producer?",
+                    options: ["Russia", "USA", "Saudi", "Iran"],
+                    correct: 1 // USA
+                },
+                {
+                    q: "Which Indian state has highest population?",
+                    options: ["Maharashtra", "UP", "Bihar", "MP"],
+                    correct: 1 // UP
+                },
+                {
+                    q: "Which currency is strongest (high value)?",
+                    options: ["Dollar", "Euro", "Kuwaiti Dinar", "Pound"],
+                    correct: 2 // Kuwaiti Dinar
+                }
+
+            ],
+            fun: [
+                {
+                    q: "What has a face and two hands but no arms or legs?",
+                    options: ["Clock", "Robot", "Doll", "Toy"],
+                    correct: 0 // Clock
+                },
+                {
+                    q: "What comes once in a minute, twice in a moment?",
+                    options: ["M", "O", "N", "T"],
+                    correct: 0 // M
+                },
+                {
+                    q: "What has a neck but no head?",
+                    options: ["Bottle", "Shirt", "Guitar", "All"],
+                    correct: 3 // All
+                },
+                {
+                    q: "What gets bigger the more you take away?",
+                    options: ["Hole", "Box", "Bag", "Balloon"],
+                    correct: 0 // Hole
+                },
+                {
+                    q: "What can travel around the world while staying in a corner?",
+                    options: ["Coin", "Stamp", "Paper", "Book"],
+                    correct: 1 // Stamp
+                },
+                {
+                    q: "What has one eye but can’t see?",
+                    options: ["Needle", "Storm", "Cyclone", "Button"],
+                    correct: 0 // Needle
+                },
+                {
+                    q: "What runs but never walks?",
+                    options: ["River", "Car", "Clock", "Wind"],
+                    correct: 0 // River
+                },
+                {
+                    q: "What is always in front of you but can’t be seen?",
+                    options: ["Air", "Future", "Time", "Shadow"],
+                    correct: 1 // Future
+                },
+                {
+                    q: "What has many teeth but can’t bite?",
+                    options: ["Comb", "Saw", "Both", "None"],
+                    correct: 2 // Both
+                },
+                {
+                    q: "What has hands but can't clap?",
+                    options: ["Clock", "Statue", "Baby", "Robot"],
+                    correct: 0 // Clock
+                }
+            ],
+            lifestyle: [
+                {
+                    q: "Which vitamin is from sunlight?",
+                    options: ["A", "B", "C", "D"],
+                    correct: 3 // Vitamin D
+                },
+                {
+                    q: "What is the main ingredient in sushi?",
+                    options: ["Bread", "Rice", "Chicken", "Potato"],
+                    correct: 1 // Rice
+                },
+                {
+                    q: "Which drink has caffeine?",
+                    options: ["Milk", "Coffee", "Juice", "Water"],
+                    correct: 1 // Coffee
+                },
+                {
+                    q: "Which exercise is best for heart?",
+                    options: ["Running", "Sleeping", "Watching TV", "Sitting"],
+                    correct: 0 // Running
+                },
+                {
+                    q: "How many hours of sleep needed (avg adult)?",
+                    options: ["3–4", "5–6", "7–9", "10–12"],
+                    correct: 2 // 7–9
+                },
+                {
+                    q: "Which is healthy fat?",
+                    options: ["Chips", "Nuts", "Soda", "Candy"],
+                    correct: 1 // Nuts
+                },
+                {
+                    q: "Which food has protein?",
+                    options: ["Rice", "Eggs", "Sugar", "Oil"],
+                    correct: 1 // Eggs
+                },
+                {
+                    q: "What helps reduce stress?",
+                    options: ["Exercise", "Junk food", "Overthinking", "None"],
+                    correct: 0 // Exercise
+                },
+                {
+                    q: "Which is a fast food?",
+                    options: ["Salad", "Pizza", "Soup", "Rice"],
+                    correct: 1 // Pizza
+                },
+                {
+                    q: "What is hydration?",
+                    options: ["Eating", "Drinking water", "Sleeping", "Running"],
+                    correct: 1 // Drinking water
+                }
+            ],
+            sports:[
+                {
+                    q: "Cricket world cup 2023 winner?",
+                    options: ["India", "Australia", "England", "NZ"],
+                    correct: 1 // Australia
+                },
+                {
+                    q: "Football WC 2022 winner?",
+                    options: ["Brazil", "Argentina", "France", "Germany"],
+                    correct: 1 // Argentina
+                },
+                {
+                    q: "Olympic games every?",
+                    options: ["2 yrs", "3 yrs", "4 yrs", "5 yrs"],
+                    correct: 2 // 4 yrs
+                },
+                {
+                    q: "National sport of India?",
+                    options: ["Cricket", "Hockey", "Kabaddi", "None"],
+                    correct: 3 // None
+                },
+                {
+                    q: "Tennis grand slam count?",
+                    options: ["2", "3", "4", "5"],
+                    correct: 2 // 4
+                },
+                {
+                    q: "IPL full form?",
+                    options: ["Indian Premier League", "Int Player League", "India Pro League", "None"],
+                    correct: 0 // Indian Premier League
+                },
+                {
+                    q: "Chess world champion (recent)?",
+                    options: ["Magnus Carlsen", "Anand", "Ding Liren", "Hikaru"],
+                    correct: 2 // Ding Liren
+                },
+                {
+                    q: "Kabaddi origin?",
+                    options: ["India", "China", "Japan", "Korea"],
+                    correct: 0 // India
+                },
+                {
+                    q: "Fastest man?",
+                    options: ["Bolt", "Tyson", "Powell", "Blake"],
+                    correct: 0 // Bolt
+                },
+                {
+                    q: "FIFA stands for?",
+                    options: [
+                    "Football Int Fed",
+                    "Fédération Internationale de Football Association",
+                    "Football Assoc",
+                    "None"
+                    ],
+                    correct: 1 // Fédération Internationale de Football Association
+                }
+            ],
+            histories: [
+                {
+                    q: "Which country’s flag has the only non-rectangular shape in the world?",
+                    options: ["Bhutan", "Nepal", "Vatican City", "Switzerland"],
+                    correct: 1 // Nepal
+                },
+                {
+                    q: "The Treaty of Tordesillas (1494) divided newly discovered lands between which two countries?",
+                    options: ["Spain & France", "Portugal & Spain", "England & Spain", "Portugal & England"],
+                    correct: 1 // Portugal & Spain
+                },
+                {
+                    q: "Which Indian dish was influenced heavily by Persian cuisine?",
+                    options: ["Dosa", "Biryani", "Idli", "Poha"],
+                    correct: 1 // Biryani
+                },
+                {
+                    q: "What is the value of ∑(n=1 to 100) n?",
+                    options: ["5000", "5050", "4950", "5100"],
+                    correct: 1 // 5050
+                },
+                {
+                    q: "Which country recently joined BRICS in its expansion phase (2024)?",
+                    options: ["Argentina", "Saudi Arabia", "Turkey", "Indonesia"],
+                    correct: 1 // Saudi Arabia
+                },
+                {
+                    q: "Which Mughal emperor banned music in his court?",
+                    options: ["Akbar", "Shah Jahan", "Aurangzeb", "Babur"],
+                    correct: 2 // Aurangzeb
+                },
+                {
+                    q: "Which food is traditionally eaten during the Japanese New Year?",
+                    options: ["Sushi", "Ramen", "Osechi", "Tempura"],
+                    correct: 2 // Osechi
+                },
+                {
+                    q: "Which mathematical constant is known as Euler’s number?",
+                    options: ["π", "e", "φ", "i"],
+                    correct: 1 // e
+                },
+                {
+                    q: "Which country has the most time zones (including overseas territories)?",
+                    options: ["USA", "Russia", "France", "UK"],
+                    correct: 2 // France
+                },
+                {
+                    q: "The “Silk Road” primarily connected China with which continent?",
+                    options: ["Africa", "Europe", "Australia", "South America"],
+                    correct: 1 // Europe
+                }
+
+            ],
+            socialawareness:[
+                {
+                    q: "What does AI stand for?",
+                    options: ["Artificial Info", "Artificial Intelligence", "Auto Input", "Advanced Internet"],
+                    correct: 1 // Artificial Intelligence
+                },
+                {
+                    q: "Which country recently became most populous?",
+                    options: ["China", "India", "USA", "Indonesia"],
+                    correct: 1 // India
+                },
+                {
+                    q: "What is Instagram mainly used for?",
+                    options: ["Banking", "Sharing photos", "Gaming", "Coding"],
+                    correct: 1 // Sharing photos
+                },
+                {
+                    q: "What does GDP stand for?",
+                    options: ["Gross Domestic Product", "Global Dev Plan", "Growth Data Plan", "None"],
+                    correct: 0 // Gross Domestic Product
+                },
+                {
+                    q: "Which app is for professional networking?",
+                    options: ["WhatsApp", "LinkedIn", "Snapchat", "Telegram"],
+                    correct: 1 // LinkedIn
+                },
+                {
+                    q: "What is climate change mainly caused by?",
+                    options: ["Cars", "Pollution", "Human activities", "All"],
+                    correct: 3 // All
+                },
+                {
+                    q: "What is online privacy?",
+                    options: ["Sharing everything", "Protecting personal data", "Hacking", "None"],
+                    correct: 1 // Protecting personal data
+                },
+                {
+                    q: "Which platform is for short videos?",
+                    options: ["TikTok", "YouTube", "Gmail", "Zoom"],
+                    correct: 0 // TikTok
+                },
+                {
+                    q: "What is cyberbullying?",
+                    options: ["Online help", "Online harassment", "Coding", "Learning"],
+                    correct: 1 // Online harassment
+                },
+                {
+                    q: "What does VPN do?",
+                    options: ["Speeds internet", "Secures connection", "Blocks apps", "None"],
+                    correct: 1 // Secures connection
+                }
+            ]
+
+        };
+
+        let currentQuiz = [];
+        let currentQuestion = 0;
+        let score = 0;
+        let timerInterval;
+        let timeLeft = 30;
+        let selectedAnswer = -1;
+        let timeUp = false;
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function startQuiz(genre) {
+            currentQuiz = quizzes[genre];
+            currentQuestion = 0;
+            score = 0;
+            showSection('quiz');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestion >= currentQuiz.length) {
+                endQuiz();
+                return;
+            }
+
+            // Reset variables
+            selectedAnswer = -1;
+            timeUp = false;
+            
+            const q = currentQuiz[currentQuestion];
+            document.getElementById('questionNumber').textContent = 
+                `Question ${currentQuestion + 1} of ${currentQuiz.length}`;
+            
+            document.getElementById('question').textContent = q.q;
+            document.getElementById('feedback').style.display = 'none';
+            
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('div');
+                btn.className = 'option';
+                btn.textContent = option;
+                btn.onclick = () => selectOption(index);
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('nextBtn').disabled = true;
+            
+            // Update progress bar
+            const progress = ((currentQuestion) / currentQuiz.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Reset and start timer
+            timeLeft = 30;
+            document.getElementById('timer').textContent = '30s';
+            startTimer();
+        }
+
+        function selectOption(selectedIndex) {
+            if (timeUp) return; // Don't allow selection after time up
+            
+            selectedAnswer = selectedIndex;
+            
+            const options = document.querySelectorAll('.option');
+            const correctIndex = currentQuiz[currentQuestion].correct;
+            
+            // Show feedback and highlight correct/wrong
+            options.forEach((option, index) => {
+                option.classList.remove('selected', 'correct', 'wrong');
+                
+                if (index === correctIndex) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && selectedIndex !== correctIndex) {
+                    option.classList.add('wrong');
+                } else if (index === selectedIndex) {
+                    option.classList.add('selected');
+                }
+            });
+            
+            // Show feedback message
+            const feedback = document.getElementById('feedback');
+            if (selectedIndex === correctIndex) {
+                feedback.textContent = '✅ Correct! Great job!';
+                feedback.className = 'feedback correct';
+                score++;
+            } else {
+                feedback.textContent = `❌ Wrong! Correct answer: "${currentQuiz[currentQuestion].options[correctIndex]}"`;
+                feedback.className = 'feedback wrong';
+            }
+            feedback.style.display = 'block';
+            
+            document.getElementById('nextBtn').disabled = false;
+            clearInterval(timerInterval);
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = timeLeft + 's';
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timeUp = true;
+                    
+                    // Auto move to next question after time up
+                    setTimeout(() => {
+                        nextQuestion(); 
+                    }, 1000); // 1 second delay to show time's up
+                }
+            }, 1000);
+        }
+
+        function endQuiz() {
+            clearInterval(timerInterval);
+            showSection('result');
+            
+            document.getElementById('finalScore').textContent = `${score}/${currentQuiz.length}`;
+            document.getElementById('coinsEarned').textContent = `✨ ${score * 10} Coins Earned!`;
+        }
+
+        function restartQuiz() {
+            showSection('home');
+        }
+        function quitQuiz() {
+            if (confirm('Are you sure you want to quit? Your progress will be lost.')) {
+                clearInterval(timerInterval);
+                showSection('home');
+            }
+        }
+    </script>
+</body>
+</html>
